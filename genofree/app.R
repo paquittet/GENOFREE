@@ -3,7 +3,6 @@ library(seqinr)
 library(ggplot2)
 library(shinythemes)
 library(tidyverse)
-library(colorBlindness)
 library(shinyjs)
 library(openxlsx)
 library(rhandsontable)
@@ -141,17 +140,7 @@ my_plotabif <- function(abifdata = data,
     color = "black"
     ) +
     
-    # scale_fill_manual(
-    #   values = colorRampPalette(
-    #     rev(paletteMartin)[-1]
-    #   )(length(unique(ref_allele_filtered$marker))),
-    #   breaks = unique(ref_allele_filtered$marker)
-    # ) +
-    # 
     geom_line(color = color) +
-    
-    # Optionally set tick marks if required (uncomment if needed)
-    # scale_x_continuous(breaks = seq(xlim[1], xlim[2], by = as.numeric(n_ticks))) +
     
     # Use a default ggplot theme
     theme_minimal() +
@@ -530,7 +519,7 @@ ui <- bslib::page_fillable(
                           fluidRow(br()),
                           fluidRow(
                             column(2),
-                            column(6, tags$img(src = "standard_expected.PNG", width = "100%")),
+                            column(6, tags$img(src = "standard_expected.png", width = "100%")),
                             column(2)
                           )
                  ),

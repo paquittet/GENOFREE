@@ -1,0 +1,12 @@
+name: GENOFREE
+title: GENOFREE
+username: pa-quittet
+account: pa-quittet
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13674681
+bundleId: 9616039
+url: https://pa-quittet.shinyapps.io/GENOFREE/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
