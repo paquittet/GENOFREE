@@ -470,6 +470,7 @@ ui <- bslib::page_fillable(
                           class = "apropos-tab",  # ID pour cibler ce panneau avec CSS
                           h2(strong("GENOFREE")),
                           strong(p("GENOFREE est une application gratuite [en cours de développement] pour la lecture de chromatogrammes et la détermination du profil génétique d'individus basée sur des données microsatellites. Pour toute question : ", span("pierre-alexandre.quittet@cefe.cnrs.fr", style = "color: blue"), ".", style = "font-size: 20px")),
+                          p(strong("Lien GitHub du projet :"), "https://github.com/paquittet/GENOFREE/blob/main/genofree"),
                           br(),
                           h2(strong("TUTORIEL ET FONCTIONNALITÉS")),
                           p(h3("Calibration des données")),
