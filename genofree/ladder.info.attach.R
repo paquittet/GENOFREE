@@ -56,16 +56,6 @@ calib_df <- data.frame(
   Time = calib_data$pos
 )
 
-plot2 <- ggplot(calib_df, aes(x = Size, y = Time)) +
-  geom_point(size = 3, color = "black", alpha = .8) +
-  geom_line(color = "black", alpha = .8) +
-  geom_smooth(method = "lm", se = FALSE, color = "darkred", linetype = "dashed") +
-  labs(
-    title = "Calibration curve (Expected LIZ sizes vs. Migration time)",
-    x = "Standard size (bp)",  # LIZ
-    y = "Migration time"       # pos
-  ) +
-  theme_minimal()
 
 plot2 <- ggplot(calib_df, aes(x = Size, y = Time)) +
   geom_point(size = 3, color = "black") +
