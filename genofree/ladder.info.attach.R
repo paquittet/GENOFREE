@@ -40,8 +40,8 @@ wei <- calib_data$wei # ladder size(bp)
 # plot 1 (chromatogram with ladder peaks)
 
 chromatogram_df <- data.frame(
-  Time = pos / 1000,        # Scale down for display
-  RFU = hei / 1000          # Scale down for display
+  Time = pos / 1000,        
+  RFU = hei / 1000          
 )
 
 plot1 <- ggplot(chromatogram_df, aes(x = Time, y = RFU)) +
