@@ -19,19 +19,12 @@ for (i in seq_len(nrow(combis))) {
   ladder_list[[key]] <- unique(sort(subset$pb))
 }
 
-
+# Exemple input 
 fluo_input <- "LIZ"
 mix_input <- "mix1"
 key <- paste0(fluo_input, "_", mix_input)
 ladder_used <- ladder_list[[key]]
 
-to.correct <- my_ladder.info.attach(
-  stored = my_samples,
-  ladder = ladder_used,
-  method = "iter2",
-  ladd.init.thresh = NULL,
-  channel.ladder = 5,
-  draw = TRUE
-)
+
 
 
