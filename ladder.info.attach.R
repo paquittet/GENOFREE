@@ -28,9 +28,9 @@ library(ggplot2)
 library(gridExtra)
 
 #  Define the folder containing .fsa files 
-fsa_folder <- "/Users/medardabiona/Desktop/Genofree/nouvelles_donnees/89694-M1-090720"
+fsa_folder <- "/data"
 
-source("/Users/medardabiona/Desktop/Genofree/GENOFREE_fonctions.R")
+source("GENOFREE_fonctions.R")
 
 
 #  Read all .fsa files in the folder 
