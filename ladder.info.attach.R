@@ -28,9 +28,16 @@ library(ggplot2)
 library(gridExtra)
 
 #  Define the folder containing .fsa files 
-fsa_folder <- "/data"
+
+fsa_folder <- "/data" 
+
+# fsa_folder <- "/Users/medardabiona/Desktop/Genofree/nouvelles_donnees/89694-M1-090720" 
 
 source("GENOFREE_fonctions.R")
+
+# source("/Users/medardabiona/Desktop/Genofree/GENOFREE_fonctions.R")
+
+
 
 
 #  Read all .fsa files in the folder 
@@ -100,12 +107,11 @@ list_data_first_calib <- list.data.covarrubias
 # Paramètres de seuils
 corr_min <- 0.999
 corr_max <- 0.99994
-corr_strict_max <- 0.99995
 thresh_seq <- seq(300, 2000, by = 100)
 
 # Fichiers échoués à la première calibration (corr < 0.999 ou corr > 0.9999)
 bad_files <- names(Filter(function(x) {
-  is.null(x$corr) || x$corr < corr_min || x$corr >= corr_strict_max
+  is.null(x$corr) || x$corr < corr_min || x$corr > corr_max
 }, list.data.covarrubias))
 
 # Calibration par fichier
@@ -148,10 +154,6 @@ for (file in bad_files) {
     message(sprintf("Calibration échouée pour %s après tous les seuils testés", file))
   }
 }
-
-
-
-
 
 
 
