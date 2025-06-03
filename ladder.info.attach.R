@@ -28,9 +28,9 @@ library(ggplot2)
 library(gridExtra)
 
 #  Define the folder containing .fsa files 
-fsa_folder <- "/data"
+fsa_folder <- "/Users/medardabiona/Desktop/Genofree/nouvelles_donnees/89694-M1-090720"
 
-source("GENOFREE_fonctions.R")
+source("/Users/medardabiona/Desktop/Genofree/GENOFREE_fonctions.R")
 
 
 #  Read all .fsa files in the folder 
@@ -97,11 +97,15 @@ list_data_first_calib <- list.data.covarrubias
 
 
 # Seuils à tester
+# Paramètres de seuils
+corr_min <- 0.999
+corr_max <- 0.99994
+corr_strict_max <- 0.99995
 thresh_seq <- seq(300, 2000, by = 100)
 
 # Fichiers échoués à la première calibration (corr < 0.999 ou corr > 0.9999)
 bad_files <- names(Filter(function(x) {
-  is.null(x$corr) || x$corr < 0.999 || x$corr >= 0.99995
+  is.null(x$corr) || x$corr < corr_min || x$corr >= corr_strict_max
 }, list.data.covarrubias))
 
 # Calibration par fichier
@@ -125,7 +129,7 @@ for (file in bad_files) {
     # Vérification de la corrélation dans l'environnement global
     if (file %in% names(list.data.covarrubias)) {
       corr_value <- list.data.covarrubias[[file]]$corr
-      if (!is.null(corr_value) && corr_value >= 0.999 && corr_value <= 0.99994) {
+      if (!is.null(corr_value) && corr_value >= corr_min && corr_value <= corr_max) {
         # Mise à jour uniquement de l'entrée recalibrée
         list_data_first_calib[[file]] <- list.data.covarrubias[[file]]
         success <- TRUE
