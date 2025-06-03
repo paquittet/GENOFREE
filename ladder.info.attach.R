@@ -19,7 +19,7 @@ my_samples <- storing.inds(folder = fsa_folder)
 #  my ladder.info.attach
 to.correct <- my_ladder.info.attach(
   stored = my_samples,
-  ladder = ladder_used,
+  ladder = ladder_used,  # defini dans la foncton de lecture de données standard des fluo + mix à partir d'un fichier
   method = "iter2",
   ladd.init.thresh = NULL,
   channel.ladder = 5,
