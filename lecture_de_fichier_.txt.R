@@ -10,6 +10,21 @@ ladder_list <- list()
 # Identifier toutes les combinaisons fluo + mix
 combis <- unique(ref_marmottes[, c("fluo", "mix")])
 
+################################################################################
+#                                                                              #
+# Ce que fait cette boucle :                                                   #
+#                                                                              #
+# 1. Parcourt chaque combinaison fluo + mix                                    #       
+# 2. Construit une clé d’identification sous la forme "FAM_mix1", "LIZ_mix2".  #
+# 3. Filtre ref_marmottes pour ne garder que les lignes correspondant à cette  #
+#    combinaison                                                               #
+# 4. Extrait la colonne pb (= tailles des fragments attendus)                  #
+# 5. Trie et déduplique les valeurs → pour créer la ladder attendue pour cette #
+#    combinaison                                                               #
+# 6. Stocke le vecteur de positions dans ladder_list[["key"]]                  #
+#                                                                              #
+################################################################################
+
 
 for (i in seq_len(nrow(combis))) {
   fluo <- combis$fluo[i]
