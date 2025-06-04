@@ -107,7 +107,7 @@ corr_min <- 0.999
 corr_max <- 0.99994
 thresh_seq <- seq(300, 2000, by = 100)
 
-# Fichiers échoués à la première calibration (corr < 0.999 ou corr > 0.9999)
+# Fichiers échoués à la première calibration (corr < corr_min ou corr > corr_max)
 bad_files <- names(Filter(function(x) {
   is.null(x$corr) || x$corr < corr_min || x$corr > corr_max
 }, list.data.covarrubias))
