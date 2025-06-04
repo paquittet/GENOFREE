@@ -26,19 +26,17 @@
 library(Fragman)
 library(ggplot2)
 library(gridExtra)
+library(commentr)
 
 #  Define the folder containing .fsa files 
 
-fsa_folder <- "/data" 
+fsa_folder <- "/data"
 
-# fsa_folder <- "/Users/medardabiona/Desktop/Genofree/nouvelles_donnees/89694-M1-090720" 
+# fsa_folder <- "/Users/medardabiona/Desktop/Genofree/Mix1"
 
 source("GENOFREE_fonctions.R")
 
 # source("/Users/medardabiona/Desktop/Genofree/GENOFREE_fonctions.R")
-
-
-
 
 #  Read all .fsa files in the folder 
 my_samples <- storing.inds(folder = fsa_folder)
@@ -114,11 +112,19 @@ bad_files <- names(Filter(function(x) {
   is.null(x$corr) || x$corr < corr_min || x$corr > corr_max
 }, list.data.covarrubias))
 
-# Calibration par fichier
-for (file in bad_files) {
-  success <- FALSE
-  i <- 1
+################################################################################
+#                                                                              #
+# La boucle for parcourt tous les fichiers mal calibrés (bad_files) et tente,  #
+# pour chacun, de les recalibrer automatiquement en testant une série de       #
+# seuils (thresh_seq).                                                         #
+#                                                                              #
+################################################################################
+
+for (file in bad_files) { 
+  success <- FALSE  # Indique si la calibration a réussi pour ce fichier
+  i <- 1.     # Index de seuil de calibration à tester dans thresh_seq
   
+  # teste plusieurs seuils jusqu'à obtenir une bonne calibration ou épuiser la liste
   while (!success && i <= length(thresh_seq)) {
     ladd.init.thresh <- thresh_seq[i]
     
