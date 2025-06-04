@@ -1,4 +1,5 @@
-ref_file <- "/Users/medardabiona/Desktop/Genofree/data/REF_MARQUEUR_MARMOTTE.txt"
+# ref_file <- "/Users/medardabiona/Desktop/Genofree/data/REF_MARQUEUR_MARMOTTE.txt"
+ref_file <- "/data/REF_MARQUEUR_MARMOTTE.txt"
 
 ref_marmottes <- read.table(ref_file, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 
