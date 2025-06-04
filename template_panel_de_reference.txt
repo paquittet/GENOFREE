@@ -1,0 +1,28 @@
+# =============================================================================
+# PANEL DE RÉFÉRENCE POUR LA CALIBRATION OU L'INTERPRÉTATION DES FICHIERS .FSA
+# -----------------------------------------------------------------------------
+# Ce fichier contient les allèles de référence connus pour chaque marqueur.
+# Chaque ligne correspond à un allèle connu, avec sa taille théorique attendue.
+# 
+# ✅ Format obligatoire (7 colonnes, séparées par des tabulations) :
+#   - marker    : nom du marqueur (ex : D8S1179, Bibl18, etc.)
+#   - fluo      : fluorochrome utilisé (ex : FAM, HEX, NED, PET, etc.)
+#   - mix       : nom du mix (ex : Mix1, Mix2, etc.)
+#   - allele    : nom ou numéro de l’allèle (peut être 101, 132a, etc.)
+#   - pb        : taille attendue en paires de bases (ex : 145.51)
+#   - se        : erreur standard associée à la taille (ex : 0.4)
+#   - couleur   : couleur visuelle associée au fluorochrome (ex : Bleu, Rouge)
+#
+# ⚠️ Ne pas modifier l’ordre ou les noms des colonnes.
+# ⚠️ Le séparateur doit être une tabulation (fichier .txt).
+# =============================================================================
+#
+# Exemple de valeurs que doit contenir le tableau 
+
+marker	fluo	mix	allele	pb	se	couleur
+Locus1	FAM	Mix1	101	101.23	0.4	Bleu
+Locus1	FAM	Mix1	102	102.48	0.4	Bleu
+Locus2	HEX	Mix1	205	204.87	0.5	Vert
+Locus3	NED	Mix2	301	300.90	0.3	Jaune
+Locus3	NED	Mix2	302	302.15	0.3	Jaune
+Locus4	PET	Mix2	401	401.67	0.4	Rouge
