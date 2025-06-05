@@ -30,13 +30,13 @@ library(commentr)
 
 #  Define the folder containing .fsa files 
 
-fsa_folder <- "/data"
+# fsa_folder <- "/data"
 
-# fsa_folder <- "/Users/medardabiona/Desktop/Genofree/Mix1"
+fsa_folder <- "/Users/medardabiona/Desktop/Genofree/Mix1"
 
-source("GENOFREE_fonctions.R")
+# source("GENOFREE_fonctions.R")
 
-# source("/Users/medardabiona/Desktop/Genofree/GENOFREE_fonctions.R")
+source("/Users/medardabiona/Desktop/Genofree/GENOFREE_fonctions.R")
 
 #  Read all .fsa files in the folder 
 my_samples <- storing.inds(folder = fsa_folder)
