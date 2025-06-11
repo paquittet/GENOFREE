@@ -31,62 +31,123 @@
 #' @param x - les données de fluroescence du chanel précisé dans ladder.info.attach
 #' @param roxy3 - contient les coordonnées des pics détectés le R2
 #' @param limi - limite de l'axe des ordonnées, calculés dans ladder.info.attach()
-plot_calibr <- function(x = x, roxy3 = roxy3, limi = limi){
+# plot_calibr <- function(x = x, roxy3 = roxy3, limi = limi){
+#   data_gg <- data.frame(rfu = as.numeric(x), index = 1:length(x))
+#   points_df <- data.frame(
+#     pos = roxy3$pos,
+#     hei = roxy3$hei,
+#     type = "Peaks selected"  # Cela servira à nommer la légende
+#   )
+#   corr_text <- paste("Correlation:", round(roxy3$corr, digits = 4))
+#   
+#   plot_temp <- ggplot(data = data_gg, aes(y = rfu, x = index)) +
+#     geom_line(lwd = 0.9, col = transp("black", 0.8)) +
+#     ylim(c(0, (limi[3] + 1000))) +
+#     ylab("RFU") +
+#     xlab("") +
+#     ggtitle(attributes(x)$mycomm) +
+#     theme_classic(base_size = 19) +
+#     scale_x_continuous(
+#       breaks = roxy3$pos,
+#       labels = roxy3$wei
+#     ) +
+#     geom_point(
+#       data = points_df,
+#       aes(x = pos, y = hei),
+#       size = 5,
+#       shape = 19
+#     ) +
+#     geom_point(
+#       data = points_df,
+#       aes(x = pos, y = hei),
+#       size = 3,
+#       shape = 19,
+#       col = "red"
+#     ) +
+#     scale_color_manual(
+#       values = c("Peaks selected" = "red"),
+#       name = NULL
+#     ) +
+#     # Ajouter une annotation en haut à gauche pour la "légende" de la corrélation
+#     annotate("label",
+#              x = min(data_gg$index),
+#              y = limi[3] + 950,
+#              label = corr_text,
+#              fontface = "bold",
+#              hjust = 0,
+#              color = "red",
+#              size = 7,
+#              label.size = 0.3,      # épaisseur du cadre
+#              label.r = unit(0.15, "lines"),  # arrondi des coins
+#              fill = "white")  +      # couleur de fond du label
+#     theme(
+#       axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)
+#     )
+#   
+#   return(plot_temp)
+# }
+
+plot_calibr <- function(x = x, roxy3 = roxy3, limi = limi) {
+  # 1. Données du signal
   data_gg <- data.frame(rfu = as.numeric(x), index = 1:length(x))
-  points_df <- data.frame(
-    pos = roxy3$pos,
-    hei = roxy3$hei,
-    type = "Peaks selected"  # Cela servira à nommer la légende
-  )
-  corr_text <- paste("Correlation:", round(roxy3$corr, digits = 4))
   
-  plot_temp <- ggplot(data = data_gg, aes(y = rfu, x = index)) +
-    geom_line(lwd = 0.9, col = transp("black", 0.8)) +
-    ylim(c(0, (limi[3] + 1000))) +
-    ylab("RFU") +
-    xlab("") +
-    ggtitle(attributes(x)$mycomm) +
-    theme_classic(base_size = 19) +
-    scale_x_continuous(
-      breaks = roxy3$pos,
-      labels = roxy3$wei
-    ) +
-    geom_point(
-      data = points_df,
-      aes(x = pos, y = hei),
-      size = 5,
-      shape = 19
-    ) +
-    geom_point(
-      data = points_df,
-      aes(x = pos, y = hei),
-      size = 3,
-      shape = 19,
-      col = "red"
-    ) +
-    scale_color_manual(
-      values = c("Peaks selected" = "red"),
-      name = NULL
-    ) +
-    # Ajouter une annotation en haut à gauche pour la "légende" de la corrélation
+  # 2. Points détectés (pics sélectionnés)
+  points_df <- data.frame(pos = roxy3$pos, hei = roxy3$hei)
+  
+  # 3. Texte de corrélation
+  corr_text <- paste("Correlation:", round(roxy3$corr, 4))
+  
+  # 4. Définir une échelle Y automatique (pour éviter d’écraser les pics)
+  ylim_top <- max(c(data_gg$rfu, roxy3$hei), na.rm = TRUE) * 1.15
+  
+  # 5. Création du graphique
+  plot_temp <- ggplot(data = data_gg, aes(x = index, y = rfu)) +
+    
+    # Courbe du chromatogramme
+    geom_line(linewidth = 0.8, color = "black") +
+    
+    # Points rouges (pics sélectionnés)
+    geom_point(data = points_df,
+               aes(x = pos, y = hei),
+               size = 3.2,
+               shape = 19,
+               color = "#8B0000") +
+    
+    # Affichage dynamique de la corrélation
     annotate("label",
-             x = min(data_gg$index),
-             y = limi[3] + 950,
+             x = min(data_gg$index) + 150,
+             y = ylim_top - 0.04 * ylim_top,
              label = corr_text,
              fontface = "bold",
              hjust = 0,
-             color = "red",
-             size = 7,
-             label.size = 0.3,      # épaisseur du cadre
-             label.r = unit(0.15, "lines"),  # arrondi des coins
-             fill = "white")  +      # couleur de fond du label
+             color = "#8B0000",
+             size = 5,
+             label.size = 0.25,
+             label.r = unit(0.2, "lines"),
+             fill = "white") +
+    
+    # Axes
+    ylim(0, ylim_top) +
+    xlab("Temps") +
+    ylab("RFU") +
+    
+    # Titre dynamique (nom du fichier)
+    ggtitle(paste("Chromatogramme", attributes(x)$mycomm)) +
+    
+    # Style graphique
+    theme_classic(base_size = 18) +
     theme(
-      axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)
+      panel.grid.major = element_line(color = "grey90", size = 0.3),
+      panel.grid.minor = element_line(color = "grey95", size = 0.2),
+      panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+      axis.line = element_line(color = "black", size = 0.6),
+      axis.title = element_text(face = "bold"),
+      axis.text = element_text(size = 13),
+      plot.title = element_text(size = 18, margin = margin(b = 10))
     )
   
   return(plot_temp)
 }
-
 
 
 
@@ -571,8 +632,7 @@ my_ladder.info.attach <- function (stored,
   warn = FALSE
   if (is.null(channel.ladder)) {
     channel.ladder <- dim(stored[[1]])[2]  # nombre de channel
-  }
-  else {
+  } else {
     channel.ladder <- channel.ladder
   }
   layout(matrix(1:3, nrow = 3, ncol = 1))
@@ -620,6 +680,8 @@ my_ladder.info.attach <- function (stored,
   )
   
   
+  
+  
   # Plot la courbe de regression de la calibration
   calib_df <- lapply(res, function(x)
     data.frame(
@@ -628,26 +690,88 @@ my_ladder.info.attach <- function (stored,
     )
   )
   
-  plot_calibration_regression <- 
-    lapply(calib_df, function(x)
-      ggplot(x, aes(x = Size, y = Time)) +
-        geom_point(size = 3, color = "black") +
-        ylim(c(min(x$Time), max(x$Time + x$Time*0.1))) +
-        geom_line(color = "black") +
-        geom_text(aes(label = Size), vjust = -2, size = 3.5, color = "darkred", alpha = 1) +  
-        geom_smooth(method = "lm", se = FALSE, color = "darkred", linetype = "dashed", alpha = .8) +
-        labs(
-          title = "",
-          x = "Standard size (bp)",  # LIZ
-          y = "Migration time"
-        ) +
-        theme_classic(base_size = 19)
-    )
+  # plot_calibration_regression <-
+  #   lapply(calib_df, function(x)
+  #     ggplot(x, aes(x = Size, y = Time)) +
+  #       geom_point(size = 3, color = "black") +
+  #       ylim(c(min(x$Time), max(x$Time + x$Time*0.1))) +
+  #       geom_line(color = "black") +
+  #       geom_text(aes(label = Size), vjust = -2, size = 3.5, color = "darkred", alpha = 1) +
+  #       geom_smooth(method = "lm", se = FALSE, color = "darkred", linetype = "dashed", alpha = .8) +
+  #       labs(
+  #         title = "",
+  #         x = "Standard size (bp)",  # LIZ
+  #         y = "Migration time"
+  #       ) +
+  #       theme_classic(base_size = 19)
+  #   )
   
-  # Afficher les plots les deux plots (calibration et regression) par fichier .fsa
+  plot_calibration_regression <- 
+    lapply(calib_df, function(df) {
+      
+      tscale <- 1000
+      
+      # 1. Référence attendue : droite rouge pointillée
+      ref_model <- lm(Size ~ Time, data = data.frame(
+        Size = sort(df$Size),
+        Time = sort(df$Time)
+      ))
+      ref_df <- data.frame(Time = seq(min(df$Time), max(df$Time), length.out = 200))
+      ref_df$Size <- predict(ref_model, newdata = ref_df)
+      
+      # 2. Courbe réelle verte (régression locale)
+      green_model <- loess(Size ~ Time, data = df)
+      green_df <- data.frame(Time = seq(min(df$Time), max(df$Time), length.out = 200))
+      green_df$Size <- predict(green_model, newdata = green_df)
+      
+      # 3. Plot
+      ggplot() +
+        #  Ligne rouge pointillée : référence
+        geom_line(data = ref_df, aes(x = Time / tscale, y = Size),
+                  color = "#FF4444", linetype = "dashed", linewidth = 0.6) +
+        
+        #  Courbe verte réelle : suit les points
+        geom_line(data = green_df, aes(x = Time / tscale, y = Size),
+                  color = "darkgreen", linewidth = 0.7) +
+        
+        #  Points calibrés
+        geom_point(data = df, aes(x = Time / tscale, y = Size),
+                   size = 2.5, color = "black") +
+        
+        #  Étiquettes tailles bp
+        geom_text(data = df, aes(x = Time / tscale, y = Size, label = Size),
+                  vjust = -1.2, color = "darkgreen", size = 4) +
+        
+        #  Axes, titre, encadrement
+        labs(
+          title = "Fonction de calibration - GS500LIZ",
+          x = "Temps/1000",
+          y = "Taille [Bp]"
+        ) +
+        theme_classic(base_size = 19) +
+        theme(
+          panel.grid.major = element_line(color = "grey90", size = 0.3),
+          panel.grid.minor = element_line(color = "grey95", size = 0.2),
+          axis.line = element_line(color = "black", size = 0.6),
+          panel.border = element_rect(color = "black", fill = NA, linewidth = 1),
+          legend.position = "none"
+        )
+    })
+  
+  # Stocker les deux plots (calibration et regression) par fichier .fsa
+  list_plot_calibration <- vector(mode = "list", length = length(plot_calibration_regression))
+  list_plot_calibration <- lapply(list_plot_calibration, function(x) 
+    vector(mode = "list", length = 2))
+  
+  names(list_plot_calibration) <- names(res)
+  
   for(i in 1:length(plot_calibration_regression)){
-    gridExtra::grid.arrange(plot_calibration[[i]], plot_calibration_regression[[i]], ncol = 2)
+    list_plot_calibration[[i]][[1]] <- plot_calibration[[i]]
+    list_plot_calibration[[i]][[2]] <- plot_calibration_regression[[i]]
   }
+  
+  
+  
   ################################################################################
   #                                                                              #
   #                                   MODIFIED                                   #
@@ -663,9 +787,13 @@ my_ladder.info.attach <- function (stored,
                                                                    0.92)), "sample(s). \nIf you wish to correct it you can try one of the following:\n"))
     cat("\na) The value of ladd.init.thresh might be too low, making noisy peaks too be abundant \n     Solution-- make sure your initial value 'init.thresh' is not below 200 RFUs\nb) You can continue your analysis without worrying for those samples or removing. Identify them as:\n     corro <- unlist(lapply(list.data.covarrubias, function(x){x$corr}))\n     (bad <- which(corro < .9999))\nc) MOST IMPORTANT! you can correct manually the bad samples using the 'ladder.corrector()' function providing the names of the bad samples (below), your ladder, and the information from the 'storing.inds' function, type ?ladder.corrector\n\nNames of the bad sample(s):\n")
   }
-  #  layout(matrix(1, 1, 1))
-  bads <- all.names[which(correlations < 0.92)]
-  if (length(bads) > 0) {
-    return(bads)
-  }
+  # #  layout(matrix(1, 1, 1))
+  # bads <- all.names[which(correlations < 0.92)]
+  # if (length(bads) > 0) {
+  #   return(bads)
+  # }
+  # 
+  # À la fin de my_ladder.info.attach()
+  env$list_plot_calibration <- list_plot_calibration
+  # return(list_plot_calibration = list_plot_calibration)
 }
