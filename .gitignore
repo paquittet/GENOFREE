@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 Genofree.Rproj
+.DS_Store
+rsconnect/shinyapps.io/pa-quittet/
