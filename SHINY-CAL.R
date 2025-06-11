@@ -42,7 +42,6 @@ library(fs)                # Fonctions liées au système de fichiers
 #                               SOURCES                                        #
 ################################################################################
 # Import des fonctions personnalisées depuis un script externe
-# source("/Users/medardabiona/Desktop/Genofree/GENOFREE_fonctions.R")
 
 source("GENOFREE_fonctions.R")
 
@@ -265,7 +264,12 @@ server <- function(input, output, session) {
       ladd <- ladder_list()[["LIZ_mix1"]]
       ladder_used(ladd)
       
-      my_ladder.info.attach(stored = my_samples(), ladder = ladd, method = "iter2", ladd.init.thresh = NULL, channel.ladder = 5, draw = TRUE)
+      my_ladder.info.attach(
+        stored = my_samples(), 
+        ladder = ladd, method = "iter2", 
+        ladd.init.thresh = NULL, 
+        channel.ladder = 5, 
+        draw = TRUE)
       
       all <- list.data.covarrubias
       result <- data.frame(
