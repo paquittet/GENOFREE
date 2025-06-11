@@ -36,6 +36,7 @@ fsa_folder <- "/Users/medardabiona/Desktop/Genofree/Mix1"
 
 # source("GENOFREE_fonctions.R")
 
+source("/Users/medardabiona/Desktop/Genofree/lecture_de_fichier_.txt.R")
 source("/Users/medardabiona/Desktop/Genofree/GENOFREE_fonctions.R")
 
 #  Read all .fsa files in the folder 
@@ -59,7 +60,7 @@ my_samples <- storing.inds(folder = fsa_folder)
 #' initial de détection. Cette calibration peut échouer sur certains fichiers 
 #' qui seront ensuite traités via une procédure de recalibration.
 
-to.correct <- my_ladder.info.attach(
+my_ladder.info.attach(
   stored = my_samples,
   ladder = ladder_used,  #' defini dans la foncton de lecture de données standard 
   #' des fluo + mix à partir d'un fichier
@@ -69,9 +70,10 @@ to.correct <- my_ladder.info.attach(
   draw = TRUE
 )
 
+gridExtra::grid.arrange(list_plot_calibration[["A02_1890_016.fsa"]][[1]], list_plot_calibration[["A02_1890_016.fsa"]][[2]], ncol = 2)
+
 # Résultat initial de calibration
 list_data_first_calib <- list.data.covarrubias
-
 
 
 
