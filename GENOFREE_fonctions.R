@@ -95,7 +95,14 @@ plot_calibr <- function(x = x, roxy3 = roxy3, limi = limi) {
   points_df <- data.frame(pos = roxy3$pos, hei = roxy3$hei)
   
   # 3. Texte de corrélation
-  corr_text <- paste("Correlation:", round(roxy3$corr, 4))
+  # corr_text <- paste("Correlation:", round(roxy3$corr, 4))
+  
+  corr_value <- if (is.null(roxy3$corr) || is.na(roxy3$corr) || roxy3$corr < 0.999 || roxy3$corr > 0.99994) {
+    "N/A"
+  } else {
+    sprintf("%.4f", roxy3$corr)
+  }
+  corr_text <- paste("Correlation:", corr_value)
   
   # 4. Définir une échelle Y automatique (pour éviter d’écraser les pics)
   ylim_top <- max(c(data_gg$rfu, roxy3$hei), na.rm = TRUE) * 1.15
