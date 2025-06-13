@@ -269,27 +269,40 @@ server <- function(input, output, session) {
         ladder = ladd, method = "iter2", 
         ladd.init.thresh = NULL, 
         channel.ladder = 5, 
-        draw = TRUE)
+        draw = TRUE
+      )
       
       all <- list.data.covarrubias
+      
       result <- data.frame(
         Fichier = names(all),
-        Corr = sapply(all, function(x) round(x$corr, 6)),
-        Erreur = sapply(all, function(x) round(x$error, 6)),
+        Corr = sapply(all, function(x) {
+          if (is.null(x$corr) || x$corr < 0.999 || x$corr > 0.99994) {
+            return("N/A")
+          } else {
+            return(round(x$corr, 6))
+          }
+        }),
         stringsAsFactors = FALSE
       )
-      result$Statut <- ifelse(result$Corr >= 0.999 & result$Corr <= 0.99994, "✅ Calibré", "❌ Échec")
+      
+      result$Statut <- ifelse(result$Corr == "N/A", "❌ Échec", "✅ Calibré")
       result <- result[order(result$Statut, decreasing = TRUE), ]
       
       output$results_table_init <- renderDT({
         datatable(result, options = list(pageLength = 15), rownames = FALSE) %>%
-          formatStyle("Statut", target = "row", backgroundColor = styleEqual(c("✅ Calibré", "❌ Échec"), c("#d9fdd3", "#fddcdc")))
+          formatStyle("Statut", target = "row",
+                      backgroundColor = styleEqual(c("✅ Calibré", "❌ Échec"), c("#d9fdd3", "#fddcdc")))
       })
       
       updateSelectInput(session, "selected_file", choices = names(all))
       all_calibrated(all)
       bad_files_global(result$Fichier[result$Statut == "❌ Échec"])
-      plot_store(list_plot_calibration)
+      
+      # Réorganisation des graphiques : échoués en premier
+      plot_order <- c(result$Fichier[result$Statut == "❌ Échec"], result$Fichier[result$Statut == "✅ Calibré"])
+      ordered_plots <- list_plot_calibration[plot_order]
+      plot_store(ordered_plots)
       current_page(1)
       calibration_done(TRUE)
       
@@ -346,22 +359,22 @@ server <- function(input, output, session) {
         }
       }
       
-      # Table des résultats recalibrés
+      # Résultats recalibrés (sans colonne Erreur)
       result <- data.frame(
         Fichier = names(list.data.recalibrated),
         Seuil = sapply(names(list.data.recalibrated), function(name) attr(list.data.recalibrated[[name]], "used_thresh")),
         Corr = sapply(list.data.recalibrated, function(x) round(x$corr, 6)),
-        Erreur = sapply(list.data.recalibrated, function(x) round(x$error, 6)),
         stringsAsFactors = FALSE
       )
       result$Statut <- "✅ Recalibré"
       
       output$results_table_recalib <- renderDT({
         datatable(result, options = list(pageLength = 15), rownames = FALSE) %>%
-          formatStyle("Statut", target = "row", backgroundColor = styleEqual("✅ Recalibré", "#d9fdd3"))
+          formatStyle("Statut", target = "row",
+                      backgroundColor = styleEqual("✅ Recalibré", "#d9fdd3"))
       })
       
-      # Fusion propre des anciens et nouveaux graphiques
+      # Mise à jour des graphiques
       old_plots <- plot_store()
       updated_plots <- old_plots
       for (f in names(list_plot_calibration)) {
@@ -369,7 +382,7 @@ server <- function(input, output, session) {
       }
       plot_store(updated_plots)
       
-      # Mise à jour de la liste des fichiers sélectionnables
+      # Mise à jour de la sélection de fichiers
       updated_choices <- unique(c(names(all_calibrated()), names(list.data.recalibrated)))
       updateSelectInput(session, "selected_file", choices = updated_choices)
       
@@ -378,7 +391,6 @@ server <- function(input, output, session) {
       })
     })
   })
-  
   output$plot_pagination <- renderUI({
     req(plot_store())
     plots <- plot_store()
