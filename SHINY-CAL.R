@@ -203,48 +203,56 @@ ui <- navbarPage(
 # - Recalibration automatique avec mise à jour des résultats graphiques et textuels
 
 server <- function(input, output, session) {
+  # Définition des racines pour la navigation dans le système de fichiers
   roots <- c(Home = fs::path_home(), "Ordinateur" = "/")
   shinyDirChoose(input, "fsa_dir", roots = roots, session = session)
   
-  fsa_path <- reactiveVal(NULL)
-  my_samples <- reactiveVal()
-  ladder_used <- reactiveVal()
-  all_calibrated <- reactiveVal()
-  recalibrated_data <- reactiveVal()
-  bad_files_global <- reactiveVal()
-  plot_store <- reactiveVal()
-  current_page <- reactiveVal(1)
-  show_specific_plot <- reactiveVal(FALSE)
-  calibration_done <- reactiveVal(FALSE)
+  # Variables réactives pour stocker les états internes
+  fsa_path <- reactiveVal(NULL)                       # Chemin du dossier fsa sélectionné
+  my_samples <- reactiveVal()                         # Fichiers .fsa importés
+  ladder_used <- reactiveVal()                        # Ladder sélectionnée pour calibration
+  all_calibrated <- reactiveVal()                     # Données calibrées
+  recalibrated_data <- reactiveVal()                  # Données recalibrées
+  bad_files_global <- reactiveVal()                   # Fichiers échoués à la calibration
+  plot_store <- reactiveVal()                         # Graphiques à afficher
+  current_page <- reactiveVal(1)                      # Page courante pour la pagination
+  show_specific_plot <- reactiveVal(FALSE)            # Affichage d’un fichier spécifique
+  calibration_done <- reactiveVal(FALSE)              # Statut de la calibration
   
+  # Indique si la calibration a été effectuée
   output$calibrationDone <- reactive({ calibration_done() })
   outputOptions(output, "calibrationDone", suspendWhenHidden = FALSE)
   
+  # Gestion de la sélection du dossier .fsa avec feedback visuel
   observeEvent(input$fsa_dir, {
     output$loading_fsa_ui <- renderUI({ span("Importation en cours...", style = "color: orange;") })
     shinyjs::delay(100, {
       fsa_path(parseDirPath(roots, input$fsa_dir))
       shinyjs::delay(300, {
-        output$loading_fsa_ui <- renderUI({ NULL })
+        output$loading_fsa_ui <- renderUI({ NULL })  # Retrait du message après l'importation
       })
     })
   })
   
+  # Affichage du chemin sélectionné
   output$selected_fsa_dir <- renderText({
     req(fsa_path())
     paste("Dossier sélectionné :", fsa_path())
   })
   
+  # Stockage des fichiers .fsa dans une variable réactive
   observeEvent(fsa_path(), {
     req(fsa_path())
     my_samples(storing.inds(folder = fsa_path()))
   })
   
+  # Lecture du fichier .txt de référence (mix, fluorochromes, marqueurs)
   ref_data <- reactive({
     req(input$ref_txt)
     read.table(input$ref_txt$datapath, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
   })
   
+  # Construction d’une liste de ladder selon mix et fluorochrome
   ladder_list <- reactive({
     df <- ref_data()
     ladder_list <- list()
@@ -256,6 +264,7 @@ server <- function(input, output, session) {
     ladder_list
   })
   
+  # Calibration initiale automatique
   observeEvent(input$launch_calibration, {
     output$progress_calibration_ui <- renderUI({ span("Calibration en cours...", style = "color: orange;") })
     shinyjs::delay(100, {
@@ -274,6 +283,7 @@ server <- function(input, output, session) {
       
       all <- list.data.covarrubias
       
+      # Création du tableau des résultats
       result <- data.frame(
         Fichier = names(all),
         Corr = sapply(all, function(x) {
@@ -303,6 +313,7 @@ server <- function(input, output, session) {
       plot_order <- c(result$Fichier[result$Statut == "❌ Échec"], result$Fichier[result$Statut == "✅ Calibré"])
       ordered_plots <- list_plot_calibration[plot_order]
       plot_store(ordered_plots)
+      
       current_page(1)
       calibration_done(TRUE)
       
@@ -312,6 +323,7 @@ server <- function(input, output, session) {
     })
   })
   
+  # Recalibration automatique des fichiers échoués
   observeEvent(input$recalibrate_bad, {
     output$progress_recalibration_ui <- renderUI({ span("Recalibration en cours...", style = "color: orange;") })
     shinyjs::delay(100, {
@@ -349,7 +361,6 @@ server <- function(input, output, session) {
               success <- TRUE
               list.data.recalibrated[[file]] <- list.data.covarrubias[[file]]
               attr(list.data.recalibrated[[file]], "used_thresh") <- thresh_seq[i]
-              message(sprintf("Fichier recalibré : %s avec un threshold de %d (corr = %.4f)", file, thresh_seq[i], corr_value))
             } else {
               i <- i + 1
             }
@@ -359,7 +370,7 @@ server <- function(input, output, session) {
         }
       }
       
-      # Résultats recalibrés (sans colonne Erreur)
+      # Affichage des résultats recalibrés
       result <- data.frame(
         Fichier = names(list.data.recalibrated),
         Seuil = sapply(names(list.data.recalibrated), function(name) attr(list.data.recalibrated[[name]], "used_thresh")),
@@ -370,8 +381,7 @@ server <- function(input, output, session) {
       
       output$results_table_recalib <- renderDT({
         datatable(result, options = list(pageLength = 15), rownames = FALSE) %>%
-          formatStyle("Statut", target = "row",
-                      backgroundColor = styleEqual("✅ Recalibré", "#d9fdd3"))
+          formatStyle("Statut", target = "row", backgroundColor = styleEqual("✅ Recalibré", "#d9fdd3"))
       })
       
       # Mise à jour des graphiques
@@ -382,7 +392,7 @@ server <- function(input, output, session) {
       }
       plot_store(updated_plots)
       
-      # Mise à jour de la sélection de fichiers
+      # Mise à jour des choix pour visualisation spécifique
       updated_choices <- unique(c(names(all_calibrated()), names(list.data.recalibrated)))
       updateSelectInput(session, "selected_file", choices = updated_choices)
       
@@ -391,6 +401,8 @@ server <- function(input, output, session) {
       })
     })
   })
+  
+  # Gestion de la pagination des graphiques (2 fichiers par page)
   output$plot_pagination <- renderUI({
     req(plot_store())
     plots <- plot_store()
@@ -408,29 +420,35 @@ server <- function(input, output, session) {
     do.call(tagList, panels)
   })
   
+  # Navigation vers page suivante
   observeEvent(input$next_page, {
     total_pages <- ceiling(length(plot_store()) / 2)
     if (current_page() < total_pages) current_page(current_page() + 1)
   })
   
+  # Navigation vers page précédente
   observeEvent(input$prev_page, {
     if (current_page() > 1) current_page(current_page() - 1)
   })
   
+  # Contrôle de l'affichage conditionnel des graphiques
   output$plotVisible <- reactive({
     !is.null(plot_store()) && length(plot_store()) > 0
   })
   outputOptions(output, "plotVisible", suspendWhenHidden = FALSE)
   
+  # Gestion du bouton "Visualiser un fichier spécifique"
   observeEvent(input$show_specific, {
     show_specific_plot(TRUE)
   })
   
+  # Affichage du chromatogramme du fichier sélectionné
   output$calibration_plot <- renderPlot({
     req(show_specific_plot(), input$selected_file, plot_store())
     plot_store()[[input$selected_file]][[1]]
   })
   
+  # Affichage de la courbe de calibration du fichier sélectionné
   output$calibration_curve <- renderPlot({
     req(show_specific_plot(), input$selected_file, plot_store())
     plot_store()[[input$selected_file]][[2]]
